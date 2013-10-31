@@ -48,16 +48,16 @@ void memory_error(void)
  * returns:
  * char* - copy of string with memory allocated
  */
-char* memory_allocate_string(char *string)
+char* memory_allocate_string(char *word)
 {
-	char *new_string;
+	char *new_word;
 
-	new_string = (char*)malloc((unsigned)(strlen(string) + 1 ));
-	if(new_string == NULL)
+	new_word = (char*)malloc((unsigned)(strlen(word) + 1 ));
+	if(new_word == NULL)
 		memory_error();
 
-	strcpy(new_string, string);
-	return (new_string);
+	strcpy(new_word, word);
+	return (new_word);
 }
 
 /*
@@ -155,6 +155,16 @@ void print_tree(struct node *top)
  * File Input *
  **************/
 
+ int validateFile(FILE *file, char *filename)
+ {
+ 	if(file == NULL)
+ 	{
+ 		fprintf(stderr, "Error unable to open file '%s'\n", filename);
+ 		return 0;
+ 	}
+ 	return 1;
+ }
+
 void read(char *name)
 {
 	char word[100];
@@ -165,11 +175,9 @@ void read(char *name)
 	FILE *file;
 
 	file = fopen(name, "r");
-	if(file == NULL)
-	{
-		fprintf(stderr, "Error: Unable to open %s\n", name);
-		exit(8);
-	}
+	if(!validateFile(file, name))
+		return;
+
 	while(1)
 	{
 
