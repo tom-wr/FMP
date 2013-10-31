@@ -159,13 +159,26 @@ void print_tree(struct node *top)
  {
  	if(file == NULL)
  	{
- 		fprintf(stderr, "Error unable to open file '%s'\n", filename);
+ 		fprintf(stderr, "!!!\tError unable to open file '%s'\n", filename);
  		return 0;
  	}
  	return 1;
  }
 
-void read(char *name)
+ char continueToNextCharacter(FILE * file)
+ {
+ 	char ch;
+ 	while(1)
+	{
+		ch = fgetc(file);
+		if(!isspace(ch) || !isblank(ch) || (ch == EOF))
+			break;
+	}
+	return ch;
+ }
+
+
+int read(char *name)
 {
 	char word[100];
 	int index;
@@ -176,17 +189,11 @@ void read(char *name)
 
 	file = fopen(name, "r");
 	if(!validateFile(file, name))
-		return;
+		return 0;
 
 	while(1)
 	{
-
-		while(1)
-		{
-			ch = fgetc(file);
-			if(!isspace(ch) || !isblank(ch) || (ch == EOF))
-				break;
-		}
+		ch = continueToNextCharacter(file);
 
 		if(ch == EOF)
 			break;
@@ -211,7 +218,10 @@ void read(char *name)
 			count = 0;
 		}
 	}
+
 	fclose(file);
+
+	return 1;
 }
 
 int main(int argc, char *argv[])
@@ -220,7 +230,8 @@ int main(int argc, char *argv[])
 
 	for(i=1; i < argc; i++)
 	{
-		read(argv[i]);
+		if(!read(argv[i]))
+			fprintf(stderr, "!!!\tSkipping file '%s' and continuing\n", argv[i]);
 	}
 	print_tree(root);
 	return (0);
