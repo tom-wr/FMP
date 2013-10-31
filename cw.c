@@ -36,7 +36,7 @@ static struct node *root = NULL; // initialize root node for the tree
  */
 void memory_error(void)
 {
-	fprintf(stderr, "A memory error has occured\n");
+	fprintf(stderr, "!!!\tA memory error has occurred\n");
 	exit(8);
 }
 
@@ -95,10 +95,6 @@ int initNode(struct node **node, char * line[4])
 {
 	if(!(*node)) // If node is null i.e. does not exist
 	{
-		/*(*node) = (struct node*)malloc(sizeof(struct node)); // create memory for node
-		if((!*node))
-			memory_error(); // throw error if node has not initialized properly*/
-
 		(*node) = memory_allocate_node();
 
 		// Initialize left and right nodes to null
@@ -177,11 +173,26 @@ void print_tree(struct node *top)
 	return ch;
  }
 
+ char* buildWord(FILE * file, char * word)
+ {
+ 	char ch;
+ 	int index;
+ 	for(index = 1; (unsigned)index < sizeof(word); index++)
+		{
+			ch = fgetc(file);
+			if(!isalpha(ch) && !isdigit(ch))
+				break;
+			word[index] = ch;
+		}
+		word[index] = '\0';
+
+ 	return word;
+ }
+
 
 int read(char *name)
 {
 	char word[100];
-	int index;
 	int count = 0;
 	int ch;
 	char* line[4];
@@ -193,22 +204,15 @@ int read(char *name)
 
 	while(1)
 	{
-		ch = continueToNextCharacter(file);
+		ch = continueToNextCharacter(file); // proceed file read to next non white space character
 
-		if(ch == EOF)
+		if(ch == EOF) // if character is End Of File finish the file reading
 			break;
 
-		word[0] = ch;
-		for(index = 1; (unsigned)index < sizeof(word); index++)
-		{
-			ch = fgetc(file);
-			if(!isalpha(ch) && !isdigit(ch))
-				break;
-			word[index] = ch;
-		}
-		word[index] = '\0';
+		word[0] = ch; // assign character to first letter in the word
+		strcpy(word, buildWord(file, word)); // build word by reading through following characters until whitespace is reached
 
-		line[count] = memory_allocate_string(word);//(char*)malloc(strlen(word));
+		line[count] = memory_allocate_string(word);
 		strcpy(line[count], word);
 		count++;
 
