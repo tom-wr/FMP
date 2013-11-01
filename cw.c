@@ -114,7 +114,7 @@ void insert(struct node**, char*[]);
  * if so, the node is initialized with variables from the supplied file line array and returns true
  * if not, returns false
  */
-int initNode(struct node **node, char * line[4])
+int initNode(struct node ** node, char * line[4])
 {
 	if(!(*node)) // If node is null i.e. does not exist
 	{
@@ -135,10 +135,16 @@ int initNode(struct node **node, char * line[4])
 	return 0; // return false is node has not been created
 }
 
-void compareNode(struct node **node, char *line[4])
+void compareNode(struct node ** node, char *line[4])
 {
 
 	int result; // stores difference between nodes for comparison
+
+	if(strcmp((*node)->ref, line[0]) == 0)
+	{
+		printf("!!!\tDuplicate ref number not allowed. The following entry was not added:\n!!!\t%s\t%s\t%s\t%s\n!!!\n", line[0], line[1], line[2], line[3]);
+		return;
+	}
 
 	// compare by age ---> last name ---> first name
 	result = atoi((*node)->age)- atoi(line[1]); //performs comparison between node age variables
@@ -147,6 +153,7 @@ void compareNode(struct node **node, char *line[4])
 	if(result == 0)
 		result = strcmp((*node)->firstname, line[2]); // comparison between first names
 
+
 	// recursive insert on left or right node depending on result
 	if(result < 0)
 		insert(&(*node)->right, line); // if comparison is smaller perform insert on right node
@@ -154,20 +161,29 @@ void compareNode(struct node **node, char *line[4])
 		insert(&(*node)->left, line); // if the same or larger perform insert on left node
 }
 
-void insert(struct node **node, char *line[4])
+void insert(struct node ** tree_node, char *line[4])
 {
-	if(initNode(node, line)) // initializes node if null
+	if(initNode(tree_node, line)) // initializes node if null
 		return; // returns if node has just been initialized
-	compareNode(node, line); // compares new entry variables to tree nodes and inserts accordingly
+	compareNode(tree_node, line); // compares new entry variables to tree nodes and inserts accordingly
 }
 
-void print_tree(struct node *top)
+void print_tree(struct node * tree_node)
 {
-	if(top == NULL)
+	if(tree_node == NULL)
 		return;
-	print_tree(top->left);
-	printf("\t%s\t%s\t%s, %s\n", top->ref, top->age, top->lastname, top->firstname);
-	print_tree(top->right);
+	print_tree(tree_node->left);
+	printf("\t%s\t%s\t%s, %s\n", tree_node->ref, tree_node->age, tree_node->lastname, tree_node->firstname);
+	print_tree(tree_node->right);
+}
+
+void print_output(struct node * tree_node)
+{
+	printf("\t-------------------------------\n");
+	printf("\t%s\t%s\t%s\t\n", "Ref", "Age", "Name");
+	printf("\t-------------------------------\n");
+	print_tree(root);
+	printf("\t-------------------------------\n\n");
 }
 
 
@@ -185,37 +201,9 @@ void print_tree(struct node *top)
  	return 1;
  }
 
- char continueToNextCharacter(FILE * file)
- {
- 	char ch;
- 	while(1)
-	{
-		ch = fgetc(file);
-		if(!isspace(ch) || !isblank(ch) || (ch == EOF))
-			break;
-	}
-	return ch;
- }
-
- char* buildWord(FILE * file, char * word)
- {
- 	char ch;
- 	int index;
- 	for(index = 1; (unsigned)index < sizeof(word); index++)
-		{
-			ch = fgetc(file);
-			if(!isalpha(ch) && !isdigit(ch))
-				break;
-			word[index] = ch;
-		}
-		word[index] = '\0';
-
- 	return word;
- }
-
  int readlines(FILE * pfile)
 {
-	char line[256], ref[30], age[30], firstname[30], lastname[30];
+	char line[256], ref[256], age[256], firstname[256], lastname[256];
 
 	while(fgets(line, 256, pfile) != NULL)
  	{
@@ -228,10 +216,15 @@ void print_tree(struct node *top)
  			memory_allocate_string(lastname)
  		};
 
+ 		/*if(!validate_entry_line(entry))
+ 		{
+ 			free_entry_line(entry);
+ 			return 0;
+ 		}*/
+
  		insert(&root, entry);
 
  		free_entry_line(entry);
-
  	}
 
  	return 1;
@@ -251,58 +244,9 @@ void print_tree(struct node *top)
  	return 1;
  }
 
-/*int read(char *name)
-{
-	FILE *file;
-	char word[100];
-	char* line[4];
-	char ch;
-	int count = 0;
-
-	file = fopen(name, "r");
-	if(!validateFile(file, name))
-		return 0;
-
-	while(1)
-	{
-		ch = continueToNextCharacter(file); // proceed file read to next non white space character
-
-		if(ch == EOF) // if character is End Of File finish the file reading
-			break;
-
-		// build next word
-		word[0] = ch; // assign character to first letter in the word
-		strcpy(word, buildWord(file, word)); // build word by reading through following characters until whitespace is reached
-
-		// add word to line array
-		line[count] = memory_allocate_string(word);
-		strcpy(line[count], word);
-
-		count++;
-
-		if(count == 4)
-		{
-			insert(&root, line);
-			count = 0;
-			int i;
-			for(i = 0; i < 4; ++i)
-			{
-				free(line[i]);
-			}
-			// while(ch != '\n' && ch != EOF)
-			// {
-			// 		ch = fgetc(file);
-			// }
-		}
-	}
-
-	fclose(file);
-
-	return 1;
-}*/
-
 int main(int argc, char *argv[])
 {
+	printf("\n");
 	int i;
 
 	for(i=1; i < argc; i++)
@@ -310,7 +254,7 @@ int main(int argc, char *argv[])
 		if(!read(argv[i]))
 			fprintf(stderr, "!!!\tSkipping file '%s' and continuing\n", argv[i]);
 	}
-	print_tree(root);
+	print_output(root);
 	free_tree(root);
 	return (0);
 }
