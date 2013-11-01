@@ -26,6 +26,37 @@ struct node
 
 static struct node *root = NULL; // initialize root node for the tree
 
+/**********
+ * Output *
+ **********/
+
+void print_error(char * error_string)
+{
+	fprintf(stderr, "!!!\t\n!!!\tERROR: %s\n!!!\n", error_string);
+}
+
+void print_entry_error(char * entry[4])
+{
+	printf("!!!\t%s\t%s\t%s\t%s\n!!!\n", entry[0], entry[1], entry[2], entry[3]);
+}
+
+void print_tree(struct node * tree_node)
+{
+	if(tree_node == NULL)
+		return;
+	print_tree(tree_node->left);
+	printf("\t%s\t%s\t%s, %s\n", tree_node->ref, tree_node->age, tree_node->lastname, tree_node->firstname);
+	print_tree(tree_node->right);
+}
+
+void print_output(struct node * tree_node)
+{
+	printf("\t-------------------------------\n");
+	printf("\t%s\t%s\t%s\t\n", "Ref", "Age", "Name");
+	printf("\t-------------------------------\n");
+	print_tree(tree_node);
+	printf("\t-------------------------------\n\n");
+}
 
 /*******************
  * Memory Handling *
@@ -83,6 +114,7 @@ void free_tree(struct node * n)
 	free(n);
 }
 
+
 /*
  * allocates memory for a node struct
  *
@@ -114,7 +146,7 @@ void insert(struct node**, char*[]);
  * if so, the node is initialized with variables from the supplied file line array and returns true
  * if not, returns false
  */
-int initNode(struct node ** node, char * line[4])
+int initNode(struct node ** node, char * entry_line[4])
 {
 	if(!(*node)) // If node is null i.e. does not exist
 	{
@@ -125,10 +157,10 @@ int initNode(struct node ** node, char * line[4])
 		(*node)->right = NULL;
 
 		// Initialize node variables from line input array
-		(*node)->ref = memory_allocate_string( line[ 0 ] );
-		(*node)->age = memory_allocate_string( line[ 1 ] );
-		(*node)->firstname = memory_allocate_string( line[ 2 ] );
-		(*node)->lastname = memory_allocate_string( line[ 3 ] );
+		(*node)->ref = memory_allocate_string( entry_line[ 0 ] );
+		(*node)->age = memory_allocate_string( entry_line[ 1 ] );
+		(*node)->firstname = memory_allocate_string( entry_line[ 2 ] );
+		(*node)->lastname = memory_allocate_string( entry_line[ 3 ] );
 
 		return 1; // return true if node has been created
 	}
@@ -142,7 +174,8 @@ void compareNode(struct node ** node, char *line[4])
 
 	if(strcmp((*node)->ref, line[0]) == 0)
 	{
-		printf("!!!\tDuplicate ref number not allowed. The following entry was not added:\n!!!\t%s\t%s\t%s\t%s\n!!!\n", line[0], line[1], line[2], line[3]);
+		print_error("Duplicate ref number not allowed. The following entry was not added:");
+		print_entry_error(line);
 		return;
 	}
 
@@ -168,25 +201,6 @@ void insert(struct node ** tree_node, char *line[4])
 	compareNode(tree_node, line); // compares new entry variables to tree nodes and inserts accordingly
 }
 
-void print_tree(struct node * tree_node)
-{
-	if(tree_node == NULL)
-		return;
-	print_tree(tree_node->left);
-	printf("\t%s\t%s\t%s, %s\n", tree_node->ref, tree_node->age, tree_node->lastname, tree_node->firstname);
-	print_tree(tree_node->right);
-}
-
-void print_output(struct node * tree_node)
-{
-	printf("\t-------------------------------\n");
-	printf("\t%s\t%s\t%s\t\n", "Ref", "Age", "Name");
-	printf("\t-------------------------------\n");
-	print_tree(tree_node);
-	printf("\t-------------------------------\n\n");
-}
-
-
 /**************
  * File Input *
  **************/
@@ -195,7 +209,7 @@ void print_output(struct node * tree_node)
  {
  	if(file == NULL)
  	{
- 		fprintf(stderr, "!!!\tError unable to open file '%s'\n", filename);
+ 		fprintf(stderr, "!!!\tERROR: Unable to open file '%s'\n", filename);
  		return 0;
  	}
  	return 1;
@@ -203,22 +217,36 @@ void print_output(struct node * tree_node)
 
  int validate_string_length(char * str, int max_length)
  {
- 	int len= strlen(str);
- 	if( strlen(str) > max_length )
+ 	int len = (int)strlen(str);
+ 	if( len > max_length )
  		return 0;
  	return 1;
  }
 
  int validate_digit_string(char * str)
  {
- 	int len= strlen(str);
+ 	int len = strlen(str);
  	int i;
  	for(i = 0; i < len; i++)
  	{
- 		
+ 		if(!isdigit(str[i]))
+ 		{
+ 			return 0;
+ 		}
  	}
  	return 1;
+ }
 
+ int validate_alpha_string(char * str)
+ {
+ 	int len = strlen(str);
+ 	int i;
+ 	for(i = 0; i < len; i++)
+ 	{
+ 		if(!isalpha(str[i]))
+ 			return 0;
+ 	}
+ 	return 1;
  }
 
  int validate_string_type(char * str, char type)
@@ -251,16 +279,38 @@ void print_output(struct node * tree_node)
  int validate_entry_line(char * entry[4])
  {
 
- 	if(		(!validate_entry_string(entry[0], 3, 'd')) 
- 		||	(!validate_entry_string(entry[1], 3, 'd'))
- 		||	(!validate_entry_string(entry[2], 100, 's'))
- 		||	(!validate_entry_string(entry[3], 100, 's'))	)
+ 	if(!validate_entry_string(entry[0], 3, 'd'))
+ 	{
+ 		print_error("Ref number must be a maximum of 3 digits long and consist of only digits:");
+ 		print_entry_error(entry);
+	 	return 0;
+ 	}
+
+ 	if(!validate_entry_string(entry[1], 3, 'd'))
+ 	{
+ 		print_error("Age must be a maximum of 3 digits long and consist of only digits:");
+ 		print_entry_error(entry);
  		return 0;
+ 	}
+ 	
+ 	if(!validate_entry_string(entry[2], 100, 'a'))
+ 	{
+ 		print_error("First name must be a maximum of 100 letters long and contain only letters:");
+ 		print_entry_error(entry);
+ 		return 0;
+ 	}
+ 	
+ 	if(!validate_entry_string(entry[3], 100, 'a'))
+ 	{
+ 		print_error("Last name must be a maximum 100 letters long and contain only letters:");
+ 		print_entry_error(entry);
+ 		return 0;
+ 	}
  	
  	else return 1;
  }
 
- int readlines(FILE * pfile)
+int readlines(FILE * pfile)
 {
 	char line[256], ref[256], age[256], firstname[256], lastname[256];
 
@@ -311,7 +361,7 @@ int main(int argc, char *argv[])
 	for(i=1; i < argc; i++)
 	{
 		if(!read(argv[i]))
-			fprintf(stderr, "!!!\tSkipping file '%s' and continuing\n", argv[i]);
+			fprintf(stderr, "!!!\tSkipping file '%s' and continuing\n!!!\n", argv[i]);
 	}
 	print_output(root);
 	free_tree(root);
