@@ -7,6 +7,7 @@
 // string to int for ref and age
 // input checking
 // scanner cohesion
+// duplicate entry
 
 
 /**************
@@ -58,6 +59,28 @@ char* memory_allocate_string(char *word)
 
 	strcpy(new_word, word);
 	return (new_word);
+}
+
+void free_entry_line(char * arr[4])
+{
+	int i;
+	for (i = 0; i < 4; ++i)
+	{
+		free(arr[i]);
+	}
+}
+
+void free_tree(struct node * n)
+{
+	if(n == NULL)
+		return;
+	free_tree(n->left);
+	free_tree(n->right);
+	free(n->firstname);
+	free(n->lastname);
+	free(n->age);
+	free(n->ref);
+	free(n);
 }
 
 /*
@@ -147,6 +170,7 @@ void print_tree(struct node *top)
 	print_tree(top->right);
 }
 
+
 /**************
  * File Input *
  **************/
@@ -189,14 +213,51 @@ void print_tree(struct node *top)
  	return word;
  }
 
-
-int read(char *name)
+ int readlines(FILE * pfile)
 {
-	char word[100];
-	int count = 0;
-	int ch;
-	char* line[4];
+	char line[256], ref[30], age[30], firstname[30], lastname[30];
+
+	while(fgets(line, 256, pfile) != NULL)
+ 	{
+ 		sscanf(line, "%s %s %s %s", ref, age, firstname, lastname);
+
+ 		char * entry[4] = { 
+ 			memory_allocate_string(ref),
+ 			memory_allocate_string(age),
+ 			memory_allocate_string(firstname),
+ 			memory_allocate_string(lastname)
+ 		};
+
+ 		insert(&root, entry);
+
+ 		free_entry_line(entry);
+
+ 	}
+
+ 	return 1;
+}
+
+ int read(char *filename)
+ {
+ 	FILE * pfile;
+ 	
+ 	pfile = fopen(filename, "r");
+ 	if(!validateFile(pfile, filename))
+		return 0;
+	
+	readlines(pfile);
+ 	
+ 	fclose(pfile);
+ 	return 1;
+ }
+
+/*int read(char *name)
+{
 	FILE *file;
+	char word[100];
+	char* line[4];
+	char ch;
+	int count = 0;
 
 	file = fopen(name, "r");
 	if(!validateFile(file, name))
@@ -209,24 +270,36 @@ int read(char *name)
 		if(ch == EOF) // if character is End Of File finish the file reading
 			break;
 
+		// build next word
 		word[0] = ch; // assign character to first letter in the word
 		strcpy(word, buildWord(file, word)); // build word by reading through following characters until whitespace is reached
 
+		// add word to line array
 		line[count] = memory_allocate_string(word);
 		strcpy(line[count], word);
+
 		count++;
 
 		if(count == 4)
 		{
 			insert(&root, line);
 			count = 0;
+			int i;
+			for(i = 0; i < 4; ++i)
+			{
+				free(line[i]);
+			}
+			// while(ch != '\n' && ch != EOF)
+			// {
+			// 		ch = fgetc(file);
+			// }
 		}
 	}
 
 	fclose(file);
 
 	return 1;
-}
+}*/
 
 int main(int argc, char *argv[])
 {
@@ -238,5 +311,6 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "!!!\tSkipping file '%s' and continuing\n", argv[i]);
 	}
 	print_tree(root);
+	free_tree(root);
 	return (0);
 }
