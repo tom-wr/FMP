@@ -182,7 +182,7 @@ void print_output(struct node * tree_node)
 	printf("\t-------------------------------\n");
 	printf("\t%s\t%s\t%s\t\n", "Ref", "Age", "Name");
 	printf("\t-------------------------------\n");
-	print_tree(root);
+	print_tree(tree_node);
 	printf("\t-------------------------------\n\n");
 }
 
@@ -201,6 +201,65 @@ void print_output(struct node * tree_node)
  	return 1;
  }
 
+ int validate_string_length(char * str, int max_length)
+ {
+ 	int len= strlen(str);
+ 	if( strlen(str) > max_length )
+ 		return 0;
+ 	return 1;
+ }
+
+ int validate_digit_string(char * str)
+ {
+ 	int len= strlen(str);
+ 	int i;
+ 	for(i = 0; i < len; i++)
+ 	{
+ 		
+ 	}
+ 	return 1;
+
+ }
+
+ int validate_string_type(char * str, char type)
+ {
+ 	switch(type)
+ 	{
+ 		case 'd':
+ 			if(!validate_digit_string(str))
+ 				return 0;
+ 			break;
+ 		case 'a':
+ 			if(!validate_alpha_string(str))
+ 				return 0;
+ 			break;
+ 		default:
+ 			printf("Incompatible type parameter");
+ 			return 0;
+ 	}
+ 	return 1;
+ }
+
+ int validate_entry_string(char * entry_string, int max_length, char expected_type)
+ {
+ 	if( (!validate_string_length(entry_string, max_length)) || (!validate_string_type(entry_string, expected_type)) )
+ 		return 0;
+ 	return 1;
+
+ }
+
+ int validate_entry_line(char * entry[4])
+ {
+
+ 	if(		(!validate_entry_string(entry[0], 3, 'd')) 
+ 		||	(!validate_entry_string(entry[1], 3, 'd'))
+ 		||	(!validate_entry_string(entry[2], 100, 's'))
+ 		||	(!validate_entry_string(entry[3], 100, 's'))	)
+ 		return 0;
+ 	
+ 	else return 1;
+ }
+
  int readlines(FILE * pfile)
 {
 	char line[256], ref[256], age[256], firstname[256], lastname[256];
@@ -216,11 +275,11 @@ void print_output(struct node * tree_node)
  			memory_allocate_string(lastname)
  		};
 
- 		/*if(!validate_entry_line(entry))
+ 		if(!validate_entry_line(entry))
  		{
  			free_entry_line(entry);
- 			return 0;
- 		}*/
+ 			continue;
+ 		}
 
  		insert(&root, entry);
 
