@@ -30,16 +30,40 @@ static struct node *root = NULL; // initialize root node for the tree
  * Output *
  **********/
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 void print_error(char * error_string)
 {
 	fprintf(stderr, "!!!\t\n!!!\tERROR: %s\n!!!\n", error_string);
 }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 void print_entry_error(char * entry[4])
 {
 	printf("!!!\t%s\t%s\t%s\t%s\n!!!\n", entry[0], entry[1], entry[2], entry[3]);
 }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 void print_tree(struct node * tree_node)
 {
 	if(tree_node == NULL)
@@ -49,6 +73,14 @@ void print_tree(struct node * tree_node)
 	print_tree(tree_node->right);
 }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 void print_output(struct node * tree_node)
 {
 	printf("\t-------------------------------\n");
@@ -76,11 +108,11 @@ void memory_error(void)
  * allocates memory for a string
  *
  * params:
- * char *string - string to be allocated memory
+ * char* word - string to be allocated memory
  * returns:
  * char* - copy of string with memory allocated
  */
-char* memory_allocate_string(char *word)
+char* memory_allocate_string(char * word)
 {
 	char *new_word;
 
@@ -92,6 +124,16 @@ char* memory_allocate_string(char *word)
 	return (new_word);
 }
 
+/*
+ * free_entry_line
+ *
+ * frees memory for each element in an entry line
+ *
+ * params:
+ * char* arr[4] - pointer to array of four strings
+ * returns:
+ * void
+ */
 void free_entry_line(char * arr[4])
 {
 	int i;
@@ -101,6 +143,14 @@ void free_entry_line(char * arr[4])
 	}
 }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 void free_tree(struct node * n)
 {
 	if(n == NULL)
@@ -167,11 +217,23 @@ int initNode(struct node ** node, char * entry_line[4])
 	return 0; // return false is node has not been created
 }
 
+
+/*
+ * Compares entry line elements to existing and inserts on it's left or right child 
+ * depending on the result of comparison checks.
+ *
+ * params:
+ * struct node** - node struct pointer to be checked against
+ * char* line - entry line array of elements to be checked 
+ * returns:
+ * void
+ */
 void compareNode(struct node ** node, char *line[4])
 {
 
 	int result; // stores difference between nodes for comparison
 
+	// check to see if ref number is a duplicate
 	if(strcmp((*node)->ref, line[0]) == 0)
 	{
 		print_error("Duplicate ref number not allowed. The following entry was not added:");
@@ -194,6 +256,17 @@ void compareNode(struct node ** node, char *line[4])
 		insert(&(*node)->left, line); // if the same or larger perform insert on left node
 }
 
+
+/*
+ * attempt to insert node into the array by initilizing node (if NULL)
+ * and then comparing to existing to find place in tree.
+ *
+ * params:
+ * struct node** tree_node - node being operated on
+ * char* line - line of entry elements to be inserted
+ * returns:
+ * void
+ */
 void insert(struct node ** tree_node, char *line[4])
 {
 	if(initNode(tree_node, line)) // initializes node if null
@@ -205,6 +278,14 @@ void insert(struct node ** tree_node, char *line[4])
  * File Input *
  **************/
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validateFile(FILE *file, char *filename)
  {
  	if(file == NULL)
@@ -215,6 +296,15 @@ void insert(struct node ** tree_node, char *line[4])
  	return 1;
  }
 
+
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_string_length(char * str, int max_length)
  {
  	int len = (int)strlen(str);
@@ -223,6 +313,15 @@ void insert(struct node ** tree_node, char *line[4])
  	return 1;
  }
 
+
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_digit_string(char * str)
  {
  	int len = strlen(str);
@@ -237,6 +336,15 @@ void insert(struct node ** tree_node, char *line[4])
  	return 1;
  }
 
+
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_alpha_string(char * str)
  {
  	int len = strlen(str);
@@ -249,6 +357,14 @@ void insert(struct node ** tree_node, char *line[4])
  	return 1;
  }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_string_type(char * str, char type)
  {
  	switch(type)
@@ -268,14 +384,30 @@ void insert(struct node ** tree_node, char *line[4])
  	return 1;
  }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_entry_string(char * entry_string, int max_length, char expected_type)
  {
- 	if( (!validate_string_length(entry_string, max_length)) || (!validate_string_type(entry_string, expected_type)) )
- 		return 0;
- 	return 1;
+	if( (!validate_string_length(entry_string, max_length)) || (!validate_string_type(entry_string, expected_type)) )
+		return 0;
+	return 1;
 
  }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int validate_entry_line(char * entry[4])
  {
 
@@ -310,6 +442,14 @@ void insert(struct node ** tree_node, char *line[4])
  	else return 1;
  }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
 int readlines(FILE * pfile)
 {
 	char line[256], ref[256], age[256], firstname[256], lastname[256];
@@ -339,6 +479,14 @@ int readlines(FILE * pfile)
  	return 1;
 }
 
+/*
+ * 
+ *
+ * params:
+ * 
+ * returns:
+ * 
+ */
  int read(char *filename)
  {
  	FILE * pfile;
@@ -353,10 +501,11 @@ int readlines(FILE * pfile)
  	return 1;
  }
 
+
 int main(int argc, char *argv[])
 {
-	printf("\n");
 	int i;
+	printf("\n");
 
 	for(i=1; i < argc; i++)
 	{

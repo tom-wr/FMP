@@ -1,0 +1,41 @@
+[==========] Running 14 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 2 tests from FileReaderTest
+[ RUN      ] FileReaderTest.ValidFiles
+[       OK ] FileReaderTest.ValidFiles (0 ms)
+[ RUN      ] FileReaderTest.InvalidFiles
+!!!	ERROR: Unable to open file 'not-a-file'
+!!!	ERROR: Unable to open file '1234'
+[       OK ] FileReaderTest.InvalidFiles (0 ms)
+[----------] 2 tests from FileReaderTest (0 ms total)
+
+[----------] 12 tests from InputValidationTest
+[ RUN      ] InputValidationTest.ValidateStringLength_valid
+[       OK ] InputValidationTest.ValidateStringLength_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateStringLength_invalid
+[       OK ] InputValidationTest.ValidateStringLength_invalid (0 ms)
+[ RUN      ] InputValidationTest.ValidateDigitString_valid
+[       OK ] InputValidationTest.ValidateDigitString_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateDigitString_invalid
+[       OK ] InputValidationTest.ValidateDigitString_invalid (0 ms)
+[ RUN      ] InputValidationTest.ValidateAlphaString_valid
+[       OK ] InputValidationTest.ValidateAlphaString_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateAlphaString_invalid
+[       OK ] InputValidationTest.ValidateAlphaString_invalid (0 ms)
+[ RUN      ] InputValidationTest.ValidateStringType_valid
+[       OK ] InputValidationTest.ValidateStringType_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateStringType_invalid
+[       OK ] InputValidationTest.ValidateStringType_invalid (0 ms)
+[ RUN      ] InputValidationTest.ValidateEntryString_valid
+[       OK ] InputValidationTest.ValidateEntryString_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateEntryString_invalid
+[       OK ] InputValidationTest.ValidateEntryString_invalid (0 ms)
+[ RUN      ] InputValidationTest.ValidateEntryLine_valid
+[       OK ] InputValidationTest.ValidateEntryLine_valid (0 ms)
+[ RUN      ] InputValidationTest.ValidateEntryLine_invalid
+[       OK ] InputValidationTest.ValidateEntryLine_invalid (0 ms)
+[----------] 12 tests from InputValidationTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 14 tests from 2 test cases ran. (0 ms total)
+[  PASSED  ] 14 tests.
